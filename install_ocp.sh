@@ -291,7 +291,7 @@ set -e
 
 # Deploy operator and wait until its up
 echo "Deploying Syndesis operator"
-$SYNDESIS_CLI install operator
+$SYNDESIS_CLI install operator --image quay.io/phantomjinx/syndesis-operator --tag 1.11.x
 
 set +e
 result=$(oc secrets link syndesis-operator syndesis-pull-secret --for=pull >$ERROR_FILE 2>&1)
@@ -300,6 +300,13 @@ set -e
 
 # Wait for deployment
 wait_for_deployments 1 syndesis-operator
+oc scale dc syndesis-operator --replicas 0 
+oc set env dc/syndesis-operator RELATED_IMAGE_SERVER=quay.io/phantomjinx/syndesis-server:1.11.x 
+oc set env dc/syndesis-operator RELATED_IMAGE_META=quay.io/phantomjinx/syndesis-meta:1.11.x 
+oc set env dc/syndesis-operator RELATED_IMAGE_UI=quay.io/phantomjinx/syndesis-ui:1.11.x 
+oc set env dc/syndesis-operator RELATED_IMAGE_S2I=quay.io/phantomjinx/syndesis-s2i:1.11.x 
+oc set env dc/syndesis-operator RELATED_IMAGE_UPGRADE=quay.io/phantomjinx/syndesis-upgrade:1.11.x 
+oc scale dc syndesis-operator --replicas 1
 
 # Check syndesis cr already installed. If force then remove first.
 syndesis_installed=$(oc get syndesis -o name | wc -l)

@@ -5,6 +5,7 @@
 source "$BASEDIR/common_config.sh"
 
 get_syndesis_bin() {
+  echo "Downloading from $SYNDESIS_DOWNLOAD_URL $SYNDESIS_BINARY $SYNDESIS_VERSION" >> /tmp/pgr.log
   get_cli_bin $SYNDESIS_DOWNLOAD_URL $SYNDESIS_BINARY $SYNDESIS_VERSION
 }
 
@@ -18,6 +19,7 @@ get_cli_bin() {
   local cli_command="$bin_dir/${name}-${version}${BINARY_FILE_EXTENSION}"
   if [ -e $cli_command ]; then
     echo $cli_command
+    echo $cli_command >> /tmp/pgr.log
     return
   fi
 
